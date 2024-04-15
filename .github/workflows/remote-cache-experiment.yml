@@ -29,7 +29,7 @@ jobs:
         echo "Test caches/*/$cache removal with --$buildCache"
 
         echo "Running build once to fully populate Gradle User Home"
-        ./gradlew -Dscan.tag.remote-cache-experiment-init --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false :app:assembleProdDebug
+        ./gradlew -Dscan.tag.remote-cache-experiment-init --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false help
         killall -9 java
 
         echo "Removing $cache from $homeDir/caches"
@@ -40,6 +40,6 @@ jobs:
         rm -rf ~/.gradle/caches/build-cache-1
 
         echo "Running build again with --${buildCache}"
-        ./gradlew --$buildCache -Dscan.tag.remote-cache-experiment-$cache-$buildCache --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false :app:assembleProdDebug
+        ./gradlew --$buildCache -Dscan.tag.remote-cache-experiment-$cache-$buildCache --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false help
       env:
         DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
