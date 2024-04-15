@@ -5,25 +5,7 @@ on:
   push:
 
 jobs:
-  remote-cache-prime:
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v4
-        - uses: actions/setup-java@v4
-          with:
-            distribution: 'temurin'
-            java-version: '17'
-        - uses: gradle/actions/setup-gradle@v3
-          with:
-            cache-disabled: true
-        - name: Run build to populate remote cache
-          run: |
-            ./gradlew --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true :app:assembleProdDebug
-          env:
-            DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-
   remote-cache-experiment:
-    needs: remote-cache-prime
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -47,7 +29,7 @@ jobs:
         echo "Test caches/*/$cache removal with --$buildCache"
 
         echo "Running build once to fully populate Gradle User Home"
-        ./gradlew -Dscan.tag.remote-cache-experiment-init --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true :app:assembleProdDebug
+        ./gradlew -Dscan.tag.remote-cache-experiment-init --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false :app:assembleProdDebug
         killall -9 java
 
         echo "Removing $cache from $homeDir/caches"
