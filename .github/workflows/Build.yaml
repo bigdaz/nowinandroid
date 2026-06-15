@@ -46,15 +46,15 @@ jobs:
           DEVELOCITY_STORE_CONFIGURATION_CACHE: 'true'
 
       - name: Check build-logic
-        run: ./gradlew :build-logic:convention:check --no-configuration-cache
+        run: ./gradlew :build-logic:convention:check 
 
       - name: Check spotless
-        run: ./gradlew spotlessCheck --no-configuration-cache
+        run: ./gradlew spotlessCheck 
 
       - name: Check Dependency Guard
         id: dependencyguard_verify
         continue-on-error: true
-        run: ./gradlew dependencyGuard --no-configuration-cache
+        run: ./gradlew dependencyGuard 
 
       - name: Prevent updating Dependency Guard baselines if this is a fork
         id: checkfork_dependencyguard
@@ -68,7 +68,7 @@ jobs:
         id: dependencyguard_baseline
         if: steps.dependencyguard_verify.outcome == 'failure' && github.event_name == 'pull_request'
         run: |
-          ./gradlew dependencyGuardBaseline --no-configuration-cache
+          ./gradlew dependencyGuardBaseline 
 
       - name: Push new Dependency Guard baselines if available
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -79,7 +79,7 @@ jobs:
           commit_message: "🤖 Updates baselines for Dependency Guard"
 
       - name: Update Graphs
-        run: ./gradlew graphUpdate --no-configuration-cache
+        run: ./gradlew graphUpdate 
         continue-on-error: true
 
       - name: Check Graphs
@@ -104,7 +104,7 @@ jobs:
       - name: Run all local screenshot tests (Roborazzi)
         id: screenshotsverify
         continue-on-error: true
-        run: ./gradlew verifyRoborazziDemoDebug --no-configuration-cache
+        run: ./gradlew verifyRoborazziDemoDebug 
 
       - name: Prevent pushing new screenshots if this is a fork
         id: checkfork_screenshots
@@ -120,7 +120,7 @@ jobs:
         id: screenshotsrecord
         if: steps.screenshotsverify.outcome == 'failure' && github.event_name == 'pull_request'
         run: |
-          ./gradlew recordRoborazziDemoDebug --no-configuration-cache
+          ./gradlew recordRoborazziDemoDebug 
 
       - name: Push new screenshots if available
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -132,10 +132,10 @@ jobs:
 
       # Run local tests after screenshot tests to avoid wrong UP-TO-DATE. TODO: Ignore screenshots.
       - name: Run local tests
-        run: ./gradlew testDemoDebug :lint:test --no-configuration-cache
+        run: ./gradlew testDemoDebug :lint:test 
 
       - name: Build all build type and flavor permutations
-        run: ./gradlew :app:assemble -PminifyWithR8=false --no-configuration-cache
+        run: ./gradlew :app:assemble -PminifyWithR8=false 
 
       - name: Upload build outputs (APKs)
         uses: actions/upload-artifact@v4
@@ -158,7 +158,7 @@ jobs:
           path: '**/build/outputs/roborazzi/*_compare.png'
 
       - name: Check lint
-        run: ./gradlew :app:lintProdRelease :app-nia-catalog:lintRelease :lint:lint --no-configuration-cache
+        run: ./gradlew :app:lintProdRelease :app-nia-catalog:lintRelease :lint:lint 
 
       - name: Upload lint reports (HTML)
         if: ${{ !cancelled() }}
@@ -189,7 +189,7 @@ jobs:
           category: lint
 
       - name: Check badging
-        run: ./gradlew :app:checkProdReleaseBadging --no-configuration-cache
+        run: ./gradlew :app:checkProdReleaseBadging 
 
   androidTest:
     runs-on: ubuntu-latest
@@ -246,17 +246,17 @@ jobs:
           disable-animations: true
           disk-size: 6000M
           heap-size: 600M
-          script: ./gradlew connectedDemoDebugAndroidTest --daemon --no-configuration-cache
+          script: ./gradlew connectedDemoDebugAndroidTest --daemon 
 
       - name: Run local tests (including Roborazzi) for the combined coverage report (only API 30)
         if: matrix.api-level == 30
         # There is no need to verify Roborazzi tests to generate coverage.
-        run: ./gradlew testDemoDebugUnitTest -Proborazzi.test.verify=false --no-configuration-cache # Add Prod if we ever add JVM tests for prod
+        run: ./gradlew testDemoDebugUnitTest -Proborazzi.test.verify=false  # Add Prod if we ever add JVM tests for prod
 
       # Add `createProdDebugUnitTestCoverageReport` if we ever add JVM tests for prod
       - name: Generate coverage reports for Debug variants (only API 30)
         if: matrix.api-level == 30
-        run: ./gradlew createDemoDebugCombinedCoverageReport --no-configuration-cache
+        run: ./gradlew createDemoDebugCombinedCoverageReport 
         
       - name: Upload test reports
         if: ${{ !cancelled() }}
